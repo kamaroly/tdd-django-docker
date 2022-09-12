@@ -1,4 +1,5 @@
 import http
+from sys import api_version
 from urllib import response
 from django.http import Http404
 from rest_framework.views import APIView
@@ -17,3 +18,17 @@ class MovieList(APIView):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+
+class MovieDetail(APIView):
+    
+    def get_objects(self, pk):
+        try:
+            return Movie.objects.get(pk=pk)
+        except Movie.DoesNotExist:
+            return Http404
+        
+    def get(self, request, pk, format=None):
+        movie = self.get_objects(pk)
+        serializer = MovieSerializer(movie)
+        return Response(serializer.data)
